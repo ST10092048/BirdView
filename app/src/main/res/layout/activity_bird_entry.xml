@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".BirdEntry">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="15dp"
+        android:background="@color/primary_color">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:text="Bird Entry"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textSize="50sp"/>
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/BirdName"
+            style="@style/TextInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:hint="Bird Name"
+            app:startIconDrawable="@drawable/baseline_drive_file_rename_outline_24">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_BirdName"
+                style="@style/TextInputEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/TextInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:hint="Category"
+            app:startIconDrawable="@drawable/baseline_category_24">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_Category"
+                style="@style/TextInputEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/TextInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:hint="Description"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_login_sub_title"
+            app:startIconDrawable="@drawable/baseline_description_24">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_Description"
+                style="@style/TextInputEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_email"
+            style="@style/TextInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:hint="Date of Capture"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_login_sub_title"
+            app:startIconDrawable="@drawable/baseline_calendar_month_24">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_Date"
+                style="@style/TextInputEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/TextInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:hint="Loaction"
+            app:startIconDrawable="@drawable/baseline_add_location_24">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_email"
+                style="@style/TextInputEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/Capture"
+            style="@style/ButtonWhite"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center"
+            android:text="Upload Bird Picture"
+            android:drawableRight="@drawable/baseline_camera_24" />
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/Save"
+            style="@style/ButtonWhite"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center"
+            android:text="ADD TO BIRD LIST"
+            android:drawableRight="@drawable/baseline_save_alt_24"/>
+    </LinearLayout>
+</androidx.drawerlayout.widget.DrawerLayout>
