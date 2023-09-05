@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/drawerLayouts"
     tools:context=".BirdEntry">
 
     <LinearLayout
@@ -115,4 +116,13 @@
             android:text="ADD TO BIRD LIST"
             android:drawableRight="@drawable/baseline_save_alt_24"/>
     </LinearLayout>
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/nav_views"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        app:menu="@menu/menu"
+        app:headerLayout="@layout/nav_header"
+        android:layout_gravity="start"
+        android:fitsSystemWindows="true">
+    </com.google.android.material.navigation.NavigationView>
 </androidx.drawerlayout.widget.DrawerLayout>

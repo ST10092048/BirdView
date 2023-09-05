@@ -52,7 +52,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_login"
-
+        style="@style/ButtonWhite"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
@@ -66,6 +66,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_register"
+        style="@style/ButtonWhite"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
