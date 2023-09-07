@@ -41,6 +41,8 @@ class BirdEntry : AppCompatActivity() {
             true
             // The code ends here
         }
+
+
     }
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (toggle.onOptionsItemSelected(item)) {
