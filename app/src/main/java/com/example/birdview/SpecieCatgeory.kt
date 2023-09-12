@@ -1,5 +1,6 @@
 package com.example.birdview
 
+import android.app.ProgressDialog
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -7,14 +8,67 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import com.example.birdview.databinding.ActivitySpecieCatgeoryBinding
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
 class SpecieCatgeory : AppCompatActivity() {
     private lateinit var binding: ActivitySpecieCatgeoryBinding
     lateinit var toggle: ActionBarDrawerToggle
+    private lateinit var SpecieCategoryAdp:SpecieCategoryAdapter
+    private lateinit var birdsList : ArrayList<SpecieViewModel>
+    private lateinit var SpecieCategoryList : ArrayList<BirdSpecieCategoryModel>
+    private lateinit var progressDialog: ProgressDialog
+    var specie =""
+    var categoryId =""
+    var TAG ="Load Species"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySpecieCatgeoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        progressDialog = ProgressDialog(this)
+        progressDialog.setTitle("Species Loading...")
+        progressDialog.setCanceledOnTouchOutside(false)
+
+       showCategories()
+    }
+    private fun showCategories() {
+        SpecieCategoryList = ArrayList()
+        birdsList = ArrayList()
+        val userID = FirebaseAuth.getInstance().currentUser?.uid
+        val referenceTime = FirebaseDatabase.getInstance().getReference("Birds")
+        referenceTime.addValueEventListener(object:ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for (i in snapshot.children){
+                    val models = i.getValue(SpecieViewModel::class.java)
+                    birdsList.add(models!!)
+                }
+                val reference = FirebaseDatabase.getInstance().getReference("Species")
+                reference.orderByChild("1").equalTo(userID).addValueEventListener(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        for (ds in snapshot.children){
+                            val model = ds.getValue(BirdSpecieCategoryModel::class.java)
+                            SpecieCategoryList.add(model!!)
+                        }
+
+                        SpecieCategoryAdp = SpecieCategoryAdapter(this@SpecieCatgeory,SpecieCategoryList)
+                        binding.CategoryRec.adapter = SpecieCategoryAdp
+
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        TODO("Not yet implemented")
+                    }
+                })
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+
+        })
 
         //This code is for the side bar
         toggle = ActionBarDrawerToggle(this@SpecieCatgeory, binding.drawerLayouts, 0, 0)

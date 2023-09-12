@@ -1,29 +1,46 @@
 package com.example.birdview
 
+import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import com.example.birdview.databinding.ActivityBirdCategoryEntryBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
 class BirdCategoryEntry : AppCompatActivity() {
     private lateinit var binding: ActivityBirdCategoryEntryBinding
     private lateinit var progressDialog: ProgressDialog
+    private lateinit var firebaseAuth: FirebaseAuth
+    private lateinit var specieArrayList: ArrayList<BirdSpecieCategoryModel>
     lateinit var toggle: ActionBarDrawerToggle
+    private val TAG = "Load Species"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding= ActivityBirdCategoryEntryBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        firebaseAuth = FirebaseAuth.getInstance()
         progressDialog = ProgressDialog(this)
         progressDialog.setTitle("Loading...")
         progressDialog.setCanceledOnTouchOutside(false)
         binding.AddSpecie.setOnClickListener {
             addDataValidate()
+        }
+        binding.Proceed.setOnClickListener {
+            val birdEntry = Intent(this, BirdEntry::class.java)
+            startActivity(birdEntry)
+        }
+        binding.CheckSpecie.setOnClickListener {
+            val checkSpecie = Intent(this, SpecieCatgeory::class.java)
+            startActivity(checkSpecie)
         }
 
         toggle = ActionBarDrawerToggle(this@BirdCategoryEntry, binding.drawerLayouts, 0, 0)
@@ -68,13 +85,13 @@ class BirdCategoryEntry : AppCompatActivity() {
 
     private fun addSpecietoFirebase() {
         progressDialog.show()
-        var userID = "1"
+        var userID = FirebaseAuth.getInstance().currentUser?.uid
         val timestamp = System.currentTimeMillis()
         val hashMap  = HashMap<String,Any>()
         hashMap["id"] = "$timestamp"
         hashMap["specie"]= specie
         hashMap["specieNumber"] = specieNumber
-        hashMap["uid"] = "$userID"
+        hashMap["uid"] = "1"
 
         val reference = FirebaseDatabase.getInstance().getReference("Species")
         reference.child("$timestamp").setValue(hashMap).addOnSuccessListener {
@@ -84,6 +101,31 @@ class BirdCategoryEntry : AppCompatActivity() {
             progressDialog.dismiss()
             Toast.makeText(this,n.message.toString(),Toast.LENGTH_SHORT).show()
         }
+
+    }
+    private fun loadCategories(){
+        Log.d(TAG,"loadSpecies : Loading Bird Species")
+        progressDialog.setMessage("Loading Categories")
+        progressDialog.show()
+        var userID = FirebaseAuth.getInstance().currentUser?.uid
+        specieArrayList = ArrayList()
+        val reference = FirebaseDatabase.getInstance().getReference("Species")
+        reference.orderByChild("1").equalTo(userID.toString()).addListenerForSingleValueEvent(object :
+            ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot){
+                specieArrayList.clear()
+                for (N in snapshot.children){
+                    val model = N.getValue(BirdSpecieCategoryModel::class.java)
+                    specieArrayList.add(model!!)
+                    Log.d(TAG,"onDataChange: ${model.specie}")
+                }
+                progressDialog.dismiss()
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+        })
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
