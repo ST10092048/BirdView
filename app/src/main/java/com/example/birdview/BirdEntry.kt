@@ -58,7 +58,7 @@ class BirdEntry : AppCompatActivity() {
         binding.navViews.setNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.Map -> {
-                    val map = Intent(this, FullMap::class.java)
+                    val map = Intent(this, MapV2::class.java)
                     startActivity(map)
                 }
                 R.id.Entry -> {
