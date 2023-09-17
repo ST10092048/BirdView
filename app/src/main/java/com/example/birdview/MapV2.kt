@@ -27,7 +27,7 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface EBirdService {
-    @GET("/v2/data/obs/CA/recent")
+    @GET("/v2/data/obs/US/recent")
     fun getBirdSightings(@Query("key") apiKey: String): Call<List<BirdSighting>> //data class
 
     data class BirdSighting(
@@ -76,7 +76,7 @@ interface EBirdService {
             } else {
                 initializeMap()
                 initializeEBirdService()
-                requestLocation()
+               // requestLocation()
             }
         }
 
@@ -115,9 +115,11 @@ interface EBirdService {
             // Set click listeners
             mMap.setOnMyLocationButtonClickListener(this)
             mMap.setOnMyLocationClickListener(this)
+            //Solution?
+            getBirdSightings()
         }
 
-        private fun requestLocation() {
+      /*  private fun requestLocation() {
             if (ActivityCompat.checkSelfPermission(
                     this,
                     Manifest.permission.ACCESS_FINE_LOCATION
@@ -125,7 +127,7 @@ interface EBirdService {
                     this,
                     Manifest.permission.ACCESS_COARSE_LOCATION
                 ) != PackageManager.PERMISSION_GRANTED
-            ) {
+            ) {sightings
                 // TODO: Consider calling
                 //    ActivityCompat#requestPermissions
                 // here to request the missing permissions, and then overriding
@@ -142,7 +144,7 @@ interface EBirdService {
                         // getBirdSightings(userLocation)
                     }
                 }
-        }
+        }*/
 
         private fun getBirdSightings() {
             val apiKey = "9riis08rlgc2"
@@ -158,6 +160,7 @@ interface EBirdService {
 
                             if (birdSightings != null) {
                                 // Add markers for bird sightings
+                                //Bird sightings for adding markers
                                 for (sighting in birdSightings) {
                                     val birdLatLng = LatLng(sighting.lat, sighting.lng)
                                     val birdMarker = MarkerOptions()
