@@ -45,14 +45,9 @@
 
         <activity
             android:name=".MapV2"
-            android:exported="true"
-            android:label="@string/title_activity_map_v2" >
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
+            android:exported="false"
+            android:label="@string/title_activity_map_v2" />
 
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
-        </activity>
         <activity
             android:name=".BirdCategoryEntry"
             android:exported="false" />
@@ -79,7 +74,13 @@
             android:exported="false" />
         <activity
             android:name=".HomePage"
-            android:exported="false" />
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".FullMap"
             android:exported="false" />

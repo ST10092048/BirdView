@@ -7,3 +7,4 @@
     android:id="@+id/map"
     tools:context=".MapV2"
     android:name="com.google.android.gms.maps.SupportMapFragment"/>
+

@@ -1,11 +1,13 @@
 package com.example.birdview
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -19,6 +21,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.example.birdview.databinding.ActivityBirdEntryBinding
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.maps.DirectionsApi
 import com.google.maps.GeoApiContext
@@ -33,7 +36,7 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 
-
+//Interface for ebirdservice
 interface EBirdService {
     //Will change endpoint to a more user sentric on for sure
     //Forgot too call the birdsighting method in the map ready method
@@ -41,7 +44,7 @@ interface EBirdService {
     @GET("/v2/data/obs/US/recent")
     fun getBirdSightings(@Query("key") apiKey: String): Call<List<BirdSighting>> //data class
 
-    //Data class
+    //the Data class
     data class BirdSighting(
         val speciesCode: String,
         val comName: String,
@@ -59,81 +62,117 @@ interface EBirdService {
         val exoticCategory: String?
     )
 }
+   //Class for most stuff
     class MapV2 : AppCompatActivity(), OnMapReadyCallback,
         GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener {
 
-        private lateinit var mMap: GoogleMap
-        private lateinit var binding: ActivityMapV2Binding
-        private lateinit var eBirdService: EBirdService
-        private lateinit var fusedLocationClient: FusedLocationProviderClient
-      //  private var userLocation: LatLng? = null
+       private lateinit var binding2: ActivityBirdEntryBinding
+       private lateinit var mMap: GoogleMap
+       lateinit var toggle: ActionBarDrawerToggle
+       private lateinit var binding: ActivityMapV2Binding
+       private lateinit var eBirdService: EBirdService
+       private lateinit var fusedLocationClient: FusedLocationProviderClient
+       //  private var userLocation: LatLng? = null
 
 
-        override fun onCreate(savedInstanceState: Bundle?) {
-            super.onCreate(savedInstanceState)
+       override fun onCreate(savedInstanceState: Bundle?) {
+           super.onCreate(savedInstanceState)
 
-            binding = ActivityMapV2Binding.inflate(layoutInflater)
-            setContentView(binding.root)
+           binding = ActivityMapV2Binding.inflate(layoutInflater)
+           setContentView(binding.root)
 
-            // Initialize FusedLocationProviderClient
-            fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+           // Initialize FusedLocationProviderClient
+           fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-            // Request location permission
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                    REQUEST_LOCATION_PERMISSION
-                )
-            } else {
-                initializeMap()
-                initializeEBirdService()
+           // Request location permission
+           if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+               != PackageManager.PERMISSION_GRANTED
+           ) {
+               ActivityCompat.requestPermissions(
+                   this,
+                   arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                   REQUEST_LOCATION_PERMISSION
+               )
+           } else {
+               initializeMap()
+               initializeEBirdService()
                // requestLocation()
-            }
-        }
+           }
+           /*This code is for the side bar
+           toggle = ActionBarDrawerToggle(this@MapV2, binding2.drawerLayouts, 0, 0)
+           binding2.drawerLayouts.addDrawerListener(toggle)
+           toggle.syncState()
+           supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        private fun initializeMap() {
-            val mapFragment = supportFragmentManager
-                .findFragmentById(R.id.map) as SupportMapFragment
-            mapFragment.getMapAsync(this)
-        }
+           binding2.navViews.setNavigationItemSelectedListener {
+               when (it.itemId) {
+                   R.id.Map -> {
+                       val map = Intent(this, MapV2::class.java)
+                       startActivity(map)
+                   }
 
-        private fun initializeEBirdService() {
-            val retrofit = Retrofit.Builder()
-                .baseUrl("https://api.ebird.org")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
+                   R.id.Entry -> {
+                       val entry = Intent(this, BirdEntry::class.java)
+                       startActivity(entry)
+                   }
 
-            eBirdService = retrofit.create(EBirdService::class.java)
-        }
+                   R.id.Category -> {
+                       val category = Intent(this, SpecieCatgeory::class.java)
+                       startActivity(category)
+                   }
 
-        override fun onMapReady(googleMap: GoogleMap) {
-            mMap = googleMap
+                   R.id.logout -> Toast.makeText(applicationContext, "cghj", Toast.LENGTH_SHORT)
+                       .show()
+               }
+               true
+               // The code ends here
 
-            // Enable the My Location layer
-            if (ActivityCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                // TODO: Handle permission request
-                return
-            }
-            mMap.isMyLocationEnabled = true
+           }*/
+       }
 
-            // Set click listeners
-            mMap.setOnMyLocationButtonClickListener(this)
-            mMap.setOnMyLocationClickListener(this)
-            //Solution?
-            getBirdSightings()
-        }
+       private fun initializeMap() {
+           val mapFragment = supportFragmentManager
+               .findFragmentById(R.id.map) as SupportMapFragment
+           mapFragment.getMapAsync(this)
+       }
 
-      /*  private fun requestLocation() {
+
+       private fun initializeEBirdService() {
+           val retrofit = Retrofit.Builder()
+               .baseUrl("https://api.ebird.org")
+               .addConverterFactory(GsonConverterFactory.create())
+               .build()
+
+           eBirdService = retrofit.create(EBirdService::class.java)
+       }
+
+       //Apply Run on UI threads here
+       // The brain
+       override fun onMapReady(googleMap: GoogleMap) {
+           mMap = googleMap
+
+           // Enable the My Location layer
+           if (ActivityCompat.checkSelfPermission(
+                   this,
+                   Manifest.permission.ACCESS_FINE_LOCATION
+               ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                   this,
+                   Manifest.permission.ACCESS_COARSE_LOCATION
+               ) != PackageManager.PERMISSION_GRANTED
+           ) {
+               // TODO: Handle permission request
+               return
+           }
+           mMap.isMyLocationEnabled = true
+
+           // Set click listeners
+           mMap.setOnMyLocationButtonClickListener(this)
+           mMap.setOnMyLocationClickListener(this)
+           //Solution? Yes it was
+           getBirdSightings()
+       }
+
+       /*  private fun requestLocation() {
             if (ActivityCompat.checkSelfPermission(
                     this,
                     Manifest.permission.ACCESS_FINE_LOCATION
@@ -160,39 +199,44 @@ interface EBirdService {
                 }
         }*/
 
-        private fun getBirdSightings() {
-            val apiKey = "9riis08rlgc2"
+       private fun getBirdSightings() {
 
-            eBirdService.getBirdSightings(apiKey)
-                .enqueue(object : Callback<List<EBirdService.BirdSighting>> {
-                    override fun onResponse(
-                        call: Call<List<EBirdService.BirdSighting>>,
-                        response: Response<List<EBirdService.BirdSighting>>
-                    ) {
-                        if (response.isSuccessful) {
-                            val birdSightings = response.body()
+           //Apikey for Ebird service
+           val apiKey = "9riis08rlgc2"
 
-                            if (birdSightings != null) {
-                                // Add markers for bird sightings
-                                //Bird sightings for adding markers
-                                for (sighting in birdSightings) {
-                                    val birdLatLng = LatLng(sighting.lat, sighting.lng)
-                                    val birdMarker = MarkerOptions()
-                                        .position(birdLatLng)
-                                        .title(sighting.comName)
-                                    mMap.addMarker(birdMarker)
-                                }
-                            }
-                        }
-                    }
+           eBirdService.getBirdSightings(apiKey)
+               .enqueue(object : Callback<List<EBirdService.BirdSighting>> {
+                   override fun onResponse(
+                       call: Call<List<EBirdService.BirdSighting>>,
+                       response: Response<List<EBirdService.BirdSighting>>
+                   ) {
+                       if (response.isSuccessful) {
+                           val birdSightings = response.body()
 
-                    override fun onFailure(call: Call<List<EBirdService.BirdSighting>>, t: Throwable) {
-                        // Handle API call failure
-                        // You can display an error message or handle it as needed
-                    }
-                })
-        }
-        /*private fun navigateToBirdSighting(sighting: EBirdService.BirdSighting) {
+                           if (birdSightings != null) {
+                               // Add markers for bird sightings
+                               //Bird sightings for adding markers
+                               for (sighting in birdSightings) {
+                                   val birdLatLng = LatLng(sighting.lat, sighting.lng)
+                                   val birdMarker = MarkerOptions()
+                                       .position(birdLatLng)
+                                       .title(sighting.comName)
+                                   mMap.addMarker(birdMarker)
+                               }
+                           }
+                       }
+                   }
+
+                   override fun onFailure(
+                       call: Call<List<EBirdService.BirdSighting>>,
+                       t: Throwable
+                   ) {
+                       // Handle API call failure
+                       // You can display an error message or handle it as needed
+                   }
+               })
+       }
+       /*private fun navigateToBirdSighting(sighting: EBirdService.BirdSighting) {
             val context = GeoApiContext.Builder()
                 .apiKey("AIzaSyB7ww08dPAlyfU4g3d_mHmfQpNXHpW9kmw")
                 .build()
@@ -232,21 +276,26 @@ interface EBirdService {
 
         } */
 
-        override fun onMyLocationClick(location: Location) {
-            //userLocation = LatLng(location.latitude, location.longitude)
-            Toast.makeText(this, "Current location:\n$location", Toast.LENGTH_LONG)
-                .show()
-        }
+       override fun onMyLocationClick(location: Location) {
+           //userLocation = LatLng(location.latitude, location.longitude)
+           Toast.makeText(this, "Current location:\n$location", Toast.LENGTH_LONG)
+               .show()
+       }
 
-        override fun onMyLocationButtonClick(): Boolean {
-            Toast.makeText(this, "MyLocation button clicked", Toast.LENGTH_SHORT)
-                .show()
-            return false
-        }
+       override fun onMyLocationButtonClick(): Boolean {
+           Toast.makeText(this, "MyLocation button clicked", Toast.LENGTH_SHORT)
+               .show()
+           return false
+       }
 
-        companion object {
-            const val REQUEST_LOCATION_PERMISSION = 1
-        }
-    }
+       companion object {
+           const val REQUEST_LOCATION_PERMISSION = 1
+       }
+
+
+
+       }
+
+
 
 
