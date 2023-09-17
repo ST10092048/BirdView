@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.birdview.databinding.ActivityMapV2Binding
+import com.google.android.gms.common.api.PendingResult
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -18,6 +19,11 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.PolylineOptions
+import com.google.maps.DirectionsApi
+import com.google.maps.GeoApiContext
+import com.google.maps.model.DirectionsResult
+import com.google.maps.model.TravelMode
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -26,10 +32,16 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
 
+
+
 interface EBirdService {
+    //Will change endpoint to a more user sentric on for sure
+    //Forgot too call the birdsighting method in the map ready method
+    //I'll implement UI threading so the baby doesnt have too load for too long
     @GET("/v2/data/obs/US/recent")
     fun getBirdSightings(@Query("key") apiKey: String): Call<List<BirdSighting>> //data class
 
+    //Data class
     data class BirdSighting(
         val speciesCode: String,
         val comName: String,
@@ -54,6 +66,8 @@ interface EBirdService {
         private lateinit var binding: ActivityMapV2Binding
         private lateinit var eBirdService: EBirdService
         private lateinit var fusedLocationClient: FusedLocationProviderClient
+      //  private var userLocation: LatLng? = null
+
 
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
@@ -178,8 +192,48 @@ interface EBirdService {
                     }
                 })
         }
+        /*private fun navigateToBirdSighting(sighting: EBirdService.BirdSighting) {
+            val context = GeoApiContext.Builder()
+                .apiKey("AIzaSyB7ww08dPAlyfU4g3d_mHmfQpNXHpW9kmw")
+                .build()
+
+            DirectionsApi.newRequest(context)
+                .origin(userLocation)  // Use user's location as origin
+                .destination(LatLng(sighting.lat, sighting.lng))
+                .mode(TravelMode.DRIVING)
+                .setCallback(object : PendingResult.Callback<DirectionsResult> {
+                    override fun onResult(result: DirectionsResult) {
+                        val route = result.routes[0]
+
+                        runOnUiThread {
+                            val polylineOptions = PolylineOptions()
+
+                            for (leg in route.legs) {
+                                for (step in leg.steps) {
+                                    val points = step.polyline.decodePath()
+
+                                    for (point in points) {
+                                        polylineOptions.add(LatLng(point.lat, point.lng))
+                                    }
+                                }
+                            }
+
+                            mMap.addPolyline(polylineOptions)
+                        }
+                    }
+
+                    override fun onFailure(e: Throwable) {
+                        Log.e("DirectionsAPI", "Failed to get directions: ${e.message}")
+                    }
+
+
+                })
+
+
+        } */
 
         override fun onMyLocationClick(location: Location) {
+            //userLocation = LatLng(location.latitude, location.longitude)
             Toast.makeText(this, "Current location:\n$location", Toast.LENGTH_LONG)
                 .show()
         }
@@ -194,4 +248,5 @@ interface EBirdService {
             const val REQUEST_LOCATION_PERMISSION = 1
         }
     }
+
 
