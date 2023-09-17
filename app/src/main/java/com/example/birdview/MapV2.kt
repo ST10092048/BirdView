@@ -1,7 +1,6 @@
 package com.example.birdview
 
 import android.Manifest
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
@@ -15,7 +14,6 @@ import com.example.birdview.databinding.ActivityMapV2Binding
 import com.google.android.gms.common.api.PendingResult
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
@@ -66,13 +64,14 @@ interface EBirdService {
     class MapV2 : AppCompatActivity(), OnMapReadyCallback,
         GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener {
 
-       private lateinit var binding2: ActivityBirdEntryBinding
+
        private lateinit var mMap: GoogleMap
        lateinit var toggle: ActionBarDrawerToggle
        private lateinit var binding: ActivityMapV2Binding
        private lateinit var eBirdService: EBirdService
        private lateinit var fusedLocationClient: FusedLocationProviderClient
-       //  private var userLocation: LatLng? = null
+       private var userLocation: LatLng? = null
+
 
 
        override fun onCreate(savedInstanceState: Bundle?) {
@@ -98,36 +97,7 @@ interface EBirdService {
                initializeEBirdService()
                // requestLocation()
            }
-           /*This code is for the side bar
-           toggle = ActionBarDrawerToggle(this@MapV2, binding2.drawerLayouts, 0, 0)
-           binding2.drawerLayouts.addDrawerListener(toggle)
-           toggle.syncState()
-           supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-           binding2.navViews.setNavigationItemSelectedListener {
-               when (it.itemId) {
-                   R.id.Map -> {
-                       val map = Intent(this, MapV2::class.java)
-                       startActivity(map)
-                   }
-
-                   R.id.Entry -> {
-                       val entry = Intent(this, BirdEntry::class.java)
-                       startActivity(entry)
-                   }
-
-                   R.id.Category -> {
-                       val category = Intent(this, SpecieCatgeory::class.java)
-                       startActivity(category)
-                   }
-
-                   R.id.logout -> Toast.makeText(applicationContext, "cghj", Toast.LENGTH_SHORT)
-                       .show()
-               }
-               true
-               // The code ends here
-
-           }*/
        }
 
        private fun initializeMap() {
@@ -169,40 +139,41 @@ interface EBirdService {
            mMap.setOnMyLocationButtonClickListener(this)
            mMap.setOnMyLocationClickListener(this)
            //Solution? Yes it was
-           getBirdSightings()
+
+           userLocation?.let {
+               getBirdSightings(it)
+           }
+               ?: run {
+                   //
+                   //  show a message or handle it in some way
+               }
+           //getBirdSightings(userLocation)
+           requestLocation()
        }
 
-       /*  private fun requestLocation() {
-            if (ActivityCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {sightings
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return
-            }
-            fusedLocationClient.lastLocation
-                .addOnSuccessListener { location: Location? ->
-                    location?.let {
-                        val userLocation = LatLng(it.latitude, it.longitude)
-                        // getBirdSightings(userLocation)
-                    }
-                }
-        }*/
+       private fun requestLocation() {
+           if (ActivityCompat.checkSelfPermission(
+                   this,
+                   Manifest.permission.ACCESS_FINE_LOCATION
+               ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                   this,
+                   Manifest.permission.ACCESS_COARSE_LOCATION
+               ) != PackageManager.PERMISSION_GRANTED
+           ) {
+               return
+           }
+           fusedLocationClient.lastLocation
+               .addOnSuccessListener { location: Location? ->
+                   location?.let {
+                       userLocation = LatLng(it.latitude, it.longitude)
+                       getBirdSightings(userLocation!!)
+                   }
+               }
+       }
 
-       private fun getBirdSightings() {
+       private fun getBirdSightings(userLocation: LatLng) {
 
-           //Apikey for Ebird service
-           val apiKey = "9riis08rlgc2"
+           val apiKey = "9riis08rlgc2" //  eBird API key
 
            eBirdService.getBirdSightings(apiKey)
                .enqueue(object : Callback<List<EBirdService.BirdSighting>> {
@@ -214,14 +185,19 @@ interface EBirdService {
                            val birdSightings = response.body()
 
                            if (birdSightings != null) {
-                               // Add markers for bird sightings
-                               //Bird sightings for adding markers
                                for (sighting in birdSightings) {
                                    val birdLatLng = LatLng(sighting.lat, sighting.lng)
                                    val birdMarker = MarkerOptions()
                                        .position(birdLatLng)
                                        .title(sighting.comName)
-                                   mMap.addMarker(birdMarker)
+
+                                   // Add marker to map
+                                   val marker = mMap.addMarker(birdMarker)
+
+                                   // Attach sighting data to the marker as a tag
+                                   if (marker != null) {
+                                       marker.setTag(sighting)
+                                   }
                                }
                            }
                        }
@@ -235,46 +211,54 @@ interface EBirdService {
                        // You can display an error message or handle it as needed
                    }
                })
+
+           // Set a click listener for the markers
+           mMap.setOnMarkerClickListener { marker ->
+               // Retrieve the sighting data from the marker's tag
+               val sighting = marker.tag as? EBirdService.BirdSighting
+               sighting?.let {
+                   navigateToBirdSighting(it)
+               }
+
+               // Return 'false' to allow default behavior (opening marker info window)
+               false
+           }
        }
-       /*private fun navigateToBirdSighting(sighting: EBirdService.BirdSighting) {
-            val context = GeoApiContext.Builder()
-                .apiKey("AIzaSyB7ww08dPAlyfU4g3d_mHmfQpNXHpW9kmw")
-                .build()
+       private fun navigateToBirdSighting(sighting: EBirdService.BirdSighting) {
+           val context = GeoApiContext.Builder()
+               .apiKey("AIzaSyAcnPpN2K87hgK2IIjDyqReQlIPjU41kvo")
+               .build()
 
-            DirectionsApi.newRequest(context)
-                .origin(userLocation)  // Use user's location as origin
-                .destination(LatLng(sighting.lat, sighting.lng))
-                .mode(TravelMode.DRIVING)
-                .setCallback(object : PendingResult.Callback<DirectionsResult> {
-                    override fun onResult(result: DirectionsResult) {
-                        val route = result.routes[0]
+           val request = DirectionsApi.newRequest(context)
+               .origin(userLocation!!.latitude.toString() + "," + userLocation!!.longitude.toString())
+               .destination(sighting.lat.toString() + "," + sighting.lng.toString())
+               .mode(TravelMode.DRIVING)
 
-                        runOnUiThread {
-                            val polylineOptions = PolylineOptions()
+           Thread {
+               try {
+                   val result = request.await()
+                   val route = result.routes[0]
 
-                            for (leg in route.legs) {
-                                for (step in leg.steps) {
-                                    val points = step.polyline.decodePath()
+                   runOnUiThread {
+                       val polylineOptions = PolylineOptions()
 
-                                    for (point in points) {
-                                        polylineOptions.add(LatLng(point.lat, point.lng))
-                                    }
-                                }
-                            }
+                       for (leg in route.legs) {
+                           for (step in leg.steps) {
+                               val points = step.polyline.decodePath()
 
-                            mMap.addPolyline(polylineOptions)
-                        }
-                    }
+                               for (point in points) {
+                                   polylineOptions.add(LatLng(point.lat, point.lng))
+                               }
+                           }
+                       }
 
-                    override fun onFailure(e: Throwable) {
-                        Log.e("DirectionsAPI", "Failed to get directions: ${e.message}")
-                    }
-
-
-                })
-
-
-        } */
+                       mMap.addPolyline(polylineOptions)
+                   }
+               } catch (e: Exception) {
+                   Log.e("DirectionsAPI", "Failed to get directions: ${e.message}")
+               }
+           }.start()
+       }
 
        override fun onMyLocationClick(location: Location) {
            //userLocation = LatLng(location.latitude, location.longitude)
