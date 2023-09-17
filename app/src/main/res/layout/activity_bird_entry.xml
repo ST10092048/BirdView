@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/drawerLayouts"
     tools:context=".BirdEntry">
 
     <LinearLayout
@@ -34,19 +35,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
         </com.google.android.material.textfield.TextInputLayout>
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/TextInputLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:hint="Category"
-            app:startIconDrawable="@drawable/baseline_category_24">
-            <com.google.android.material.textfield.TextInputEditText
+
+            <TextView
                 android:id="@+id/et_Category"
-                style="@style/TextInputEditText"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:layout_height="48dp"
+                android:background="@color/grey_light"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical"
+                android:hint="Category"
+                android:drawableLeft="@drawable/baseline_category_24"
+                android:paddingLeft="5dp"
+                android:drawablePadding="10dp" />
+
         <com.google.android.material.textfield.TextInputLayout
             style="@style/TextInputLayout"
             android:layout_width="match_parent"
@@ -64,24 +65,22 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
         </com.google.android.material.textfield.TextInputLayout>
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/til_email"
-            style="@style/TextInputLayout"
+        <EditText
+            android:id="@+id/et_Date"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
+            android:textColor="@color/black"
             android:layout_marginTop="10dp"
-            android:hint="Date of Capture"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_login_sub_title"
-            app:startIconDrawable="@drawable/baseline_calendar_month_24">
+            android:hint="Select of Site date"
+            android:paddingLeft="5dp"
+            android:drawablePadding="10dp"
+            android:background="@color/white"
+            android:drawableLeft="@drawable/baseline_calendar_month_24"
+            android:clickable="false"
+            android:cursorVisible="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"/>
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/et_Date"
-                style="@style/TextInputEditText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </com.google.android.material.textfield.TextInputLayout>
         <com.google.android.material.textfield.TextInputLayout
             style="@style/TextInputLayout"
             android:layout_width="match_parent"
@@ -91,7 +90,7 @@
             app:startIconDrawable="@drawable/baseline_add_location_24">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/et_email"
+                android:id="@+id/et_loaction"
                 style="@style/TextInputEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
@@ -115,4 +114,13 @@
             android:text="ADD TO BIRD LIST"
             android:drawableRight="@drawable/baseline_save_alt_24"/>
     </LinearLayout>
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/nav_views"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        app:menu="@menu/menu"
+        app:headerLayout="@layout/nav_header"
+        android:layout_gravity="start"
+        android:fitsSystemWindows="true">
+    </com.google.android.material.navigation.NavigationView>
 </androidx.drawerlayout.widget.DrawerLayout>
