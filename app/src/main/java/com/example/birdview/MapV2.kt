@@ -20,6 +20,8 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.example.birdview.databinding.ActivityBirdEntryBinding
+import com.google.android.gms.maps.GoogleMapOptions
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.maps.DirectionsApi
 import com.google.maps.GeoApiContext
@@ -104,8 +106,10 @@ interface EBirdService {
 
        private fun initializeMap() {
            val mapFragment = supportFragmentManager
+
                .findFragmentById(R.id.map) as SupportMapFragment
            mapFragment.getMapAsync(this)
+           //supportMapFragment.newInstance(GoogleMapOptions options)
        }
 
 
@@ -121,8 +125,13 @@ interface EBirdService {
        //Apply Run on UI threads here
        // The brain
        override fun onMapReady(googleMap: GoogleMap) {
-           mMap = googleMap
 
+           val options = GoogleMapOptions()
+
+
+           mMap = googleMap
+           mMap.mapType = GoogleMap.MAP_TYPE_HYBRID
+            mMap.isTrafficEnabled = true
            // Enable the My Location layer
            if (ActivityCompat.checkSelfPermission(
                    this,
@@ -136,7 +145,12 @@ interface EBirdService {
                return
            }
            mMap.isMyLocationEnabled = true
+           //Map type
 
+           options.mapType(GoogleMap.MAP_TYPE_HYBRID)
+               .compassEnabled(true)
+               .rotateGesturesEnabled(false)
+               .tiltGesturesEnabled(false)
            // Set click listeners
            mMap.setOnMyLocationButtonClickListener(this)
            mMap.setOnMyLocationClickListener(this)
@@ -192,6 +206,7 @@ interface EBirdService {
                                    val birdMarker = MarkerOptions()
                                        .position(birdLatLng)
                                        .title(sighting.comName)
+                                       //.icon(BitmapDescriptorFactory.fromResource(R.mipmap.bird_marker))
 
                                    // Add marker to map
                                    val marker = mMap.addMarker(birdMarker)
@@ -236,6 +251,7 @@ interface EBirdService {
                .origin(userLocation!!.latitude.toString() + "," + userLocation!!.longitude.toString())
                .destination(sighting.lat.toString() + "," + sighting.lng.toString())
                .mode(TravelMode.DRIVING)
+
 
            Thread {
                try {
