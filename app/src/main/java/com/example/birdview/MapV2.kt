@@ -61,6 +61,8 @@ interface EBirdService {
     )
 }
    //Class for most stuff
+    //Run on UI thread too boost performance
+
     class MapV2 : AppCompatActivity(), OnMapReadyCallback,
         GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener {
 
@@ -145,7 +147,7 @@ interface EBirdService {
            }
                ?: run {
                    //
-                   //  show a message or handle it in some way
+                   //will implement -- Changes
                }
            //getBirdSightings(userLocation)
            requestLocation()
@@ -226,6 +228,7 @@ interface EBirdService {
        }
        private fun navigateToBirdSighting(sighting: EBirdService.BirdSighting) {
            val context = GeoApiContext.Builder()
+                   //Changed second version of the API that includes Google Directions Api and Maps API
                .apiKey("AIzaSyAcnPpN2K87hgK2IIjDyqReQlIPjU41kvo")
                .build()
 
