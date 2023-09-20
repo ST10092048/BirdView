@@ -2,6 +2,7 @@ package com.example.birdview
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
@@ -34,6 +35,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
+import kotlin.concurrent.thread
 
 
 //Interface for ebirdservice
@@ -97,19 +99,20 @@ interface EBirdService {
                    REQUEST_LOCATION_PERMISSION
                )
            } else {
+
                initializeMap()
                initializeEBirdService()
-               // requestLocation()
+
            }
 
        }
 
        private fun initializeMap() {
-           val mapFragment = supportFragmentManager
 
-               .findFragmentById(R.id.map) as SupportMapFragment
-           mapFragment.getMapAsync(this)
-           //supportMapFragment.newInstance(GoogleMapOptions options)
+               val mapFragment = supportFragmentManager
+                   .findFragmentById(R.id.map) as SupportMapFragment
+               mapFragment.getMapAsync(this)
+
        }
 
 
@@ -126,31 +129,24 @@ interface EBirdService {
        // The brain
        override fun onMapReady(googleMap: GoogleMap) {
 
-           val options = GoogleMapOptions()
-
-
+            val options = GoogleMapOptions()
            mMap = googleMap
            mMap.mapType = GoogleMap.MAP_TYPE_HYBRID
-            mMap.isTrafficEnabled = true
+           mMap.isTrafficEnabled = true
+
            // Enable the My Location layer
+
            if (ActivityCompat.checkSelfPermission(
-                   this,
-                   Manifest.permission.ACCESS_FINE_LOCATION
+                   this, Manifest.permission.ACCESS_FINE_LOCATION
                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
                    this,
                    Manifest.permission.ACCESS_COARSE_LOCATION
-               ) != PackageManager.PERMISSION_GRANTED
-           ) {
-               // TODO: Handle permission request
+                        ) != PackageManager.PERMISSION_GRANTED
+                    ) {
+                        // TODO: Handle permission request
                return
            }
            mMap.isMyLocationEnabled = true
-           //Map type
-
-           options.mapType(GoogleMap.MAP_TYPE_HYBRID)
-               .compassEnabled(true)
-               .rotateGesturesEnabled(false)
-               .tiltGesturesEnabled(false)
            // Set click listeners
            mMap.setOnMyLocationButtonClickListener(this)
            mMap.setOnMyLocationClickListener(this)
@@ -158,13 +154,14 @@ interface EBirdService {
 
            userLocation?.let {
                getBirdSightings(it)
-           }
-               ?: run {
-                   //
-                   //will implement -- Changes
-               }
-           //getBirdSightings(userLocation)
-           requestLocation()
+                    }
+                        ?: run {
+
+                            //will implement -- Changes
+                            }
+                    //getBirdSightings(userLocation)
+                    requestLocation()
+
        }
 
        private fun requestLocation() {
@@ -206,6 +203,8 @@ interface EBirdService {
                                    val birdMarker = MarkerOptions()
                                        .position(birdLatLng)
                                        .title(sighting.comName)
+                                       .snippet(sighting.locName)
+
                                        //.icon(BitmapDescriptorFactory.fromResource(R.mipmap.bird_marker))
 
                                    // Add marker to map
@@ -267,11 +266,14 @@ interface EBirdService {
 
                                for (point in points) {
                                    polylineOptions.add(LatLng(point.lat, point.lng))
+                                   polylineOptions.color(Color.BLUE)
+
                                }
                            }
                        }
 
                        mMap.addPolyline(polylineOptions)
+
                    }
                } catch (e: Exception) {
                    Log.e("DirectionsAPI", "Failed to get directions: ${e.message}")
@@ -286,7 +288,7 @@ interface EBirdService {
        }
 
        override fun onMyLocationButtonClick(): Boolean {
-           Toast.makeText(this, "MyLocation button clicked", Toast.LENGTH_SHORT)
+           Toast.makeText(this, "Locating your phone ", Toast.LENGTH_SHORT)
                .show()
            return false
        }
@@ -294,7 +296,6 @@ interface EBirdService {
        companion object {
            const val REQUEST_LOCATION_PERMISSION = 1
        }
-
 
 
        }
