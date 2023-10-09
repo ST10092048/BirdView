@@ -131,8 +131,10 @@ interface EBirdService {
 
             val options = GoogleMapOptions()
            mMap = googleMap
+           // set map type too Hybrid instead of normal messes with the api
+
            mMap.mapType = GoogleMap.MAP_TYPE_HYBRID
-           mMap.isTrafficEnabled = true
+           mMap.isTrafficEnabled = false
 
            // Enable the My Location layer
 
@@ -203,7 +205,8 @@ interface EBirdService {
                                    val birdMarker = MarkerOptions()
                                        .position(birdLatLng)
                                        .title(sighting.comName)
-                                       .snippet(sighting.locName)
+                                       .snippet("Spotted :" + Integer.toString(sighting.howMany))
+
 
                                        //.icon(BitmapDescriptorFactory.fromResource(R.mipmap.bird_marker))
 
